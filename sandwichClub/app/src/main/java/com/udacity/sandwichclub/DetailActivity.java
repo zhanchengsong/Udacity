@@ -65,6 +65,12 @@ public class DetailActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setContentView(R.layout.activity_main);
+    }
+
     private void populateUI(Sandwich sandwich) {
         origin_tv.append(sandwich.getPlaceOfOrigin()+"\n");
         description_tv.append(sandwich.getDescription() + "\n");

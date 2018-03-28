@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         debug_tv = findViewById(R.id.tv_debug);
-
+        new getMovieTask().execute();
 
     }
 
@@ -30,7 +30,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             tmdbRestServices service = tmdbRestServices.getTMDBService();
-            data = service.getPopularMovieList();
+            try {
+                data = service.getPopularMovieList();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return null;
         }
 

@@ -3,27 +3,45 @@ package ninja.zhancheng.popularmovie;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 
 import networkServices.tmdbRestServices;
+import recyclerAdapters.homeGridAdapter;
 
 public class MainActivity extends AppCompatActivity {
     private TextView debug_tv;
+    private JsonArray bootstrap_data;
+    //Adapter
+    homeGridAdapter homeAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        debug_tv = findViewById(R.id.tv_debug);
+        //Call to populate the boostrap data
         new getMovieTask().execute();
 
+
     }
 
-    public void debugRest(JsonArray json_arr){
-        debug_tv.setText(json_arr.toString());
+
+
+    public void populateView(){
+        //Get the view and set to a grid view
+        RecyclerView recyclerView = findViewById(R.id.posterGrid);
+        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+
+        //Use the data to populate the adapter
+        homeAdapter = new homeGridAdapter(this, bootstrap_data);
+        recyclerView.setAdapter(homeAdapter);
     }
 
+
+
+    // Task to retrive information from the tmdb rest services
     public class getMovieTask extends AsyncTask<Void,Void,Void> {
 
         private JsonArray data;
@@ -32,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             tmdbRestServices service = tmdbRestServices.getTMDBService();
             try {
                 data = service.getPopularMovieList();
+                bootstrap_data = data;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -41,7 +60,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            debugRest(data);
+
+            populateView();
+
         }
     }
+
+
 }

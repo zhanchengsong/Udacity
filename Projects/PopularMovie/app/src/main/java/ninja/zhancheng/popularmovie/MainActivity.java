@@ -1,22 +1,24 @@
 package ninja.zhancheng.popularmovie;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.widget.GridView;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 
+import java.util.List;
+
+import ViewAdapters.ImageAdapter;
 import networkServices.tmdbRestServices;
-import recyclerAdapters.homeGridAdapter;
 
 public class MainActivity extends AppCompatActivity {
     private TextView debug_tv;
     private JsonArray bootstrap_data;
     //Adapter
-    homeGridAdapter homeAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,39 +31,40 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void populateView(){
-        //Get the view and set to a grid view
-        RecyclerView recyclerView = findViewById(R.id.posterGrid);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+    public void populateView(List<Bitmap> photos){
 
-        //Use the data to populate the adapter
-        homeAdapter = new homeGridAdapter(this, bootstrap_data);
-        recyclerView.setAdapter(homeAdapter);
+
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        gridview.setAdapter(new ImageAdapter(bootstrap_data, this, photos));
+
     }
 
 
 
     // Task to retrive information from the tmdb rest services
-    public class getMovieTask extends AsyncTask<Void,Void,Void> {
+    public class getMovieTask extends AsyncTask<Void,Void,List<Bitmap>> {
 
         private JsonArray data;
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected List<Bitmap> doInBackground(Void... voids) {
             tmdbRestServices service = tmdbRestServices.getTMDBService();
+            List<Bitmap> photos = null;
             try {
                 data = service.getPopularMovieList();
                 bootstrap_data = data;
+                photos = service.getPopularPosters();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return null;
+            return photos;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(List<Bitmap> photos) {
+            super.onPostExecute(photos);
 
-            populateView();
+            populateView(photos);
 
         }
     }

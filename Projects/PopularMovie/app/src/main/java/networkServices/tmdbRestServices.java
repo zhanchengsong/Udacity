@@ -1,5 +1,7 @@
 package networkServices;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
@@ -11,7 +13,10 @@ import com.google.gson.JsonObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -81,6 +86,19 @@ public class tmdbRestServices {
 
         }
         return popularMovieListJson;
+    }
+
+    public List<Bitmap> getPopularPosters() throws Exception {
+        JsonArray internal_json = this.getPopularMovieList();
+        Log.i ("getPopularPosters", "Processiong JSON: " + internal_json);
+        List<Bitmap> posters = new ArrayList<>();
+        for (int i=0; i<internal_json.size(); i++){
+            URL photo_url = new URL("http://image.tmdb.org/t/p/w185/" + internal_json.get(i).getAsJsonObject().get("poster_path").getAsString());
+            Bitmap bitmap = BitmapFactory.decodeStream(  (InputStream) photo_url.getContent() );
+            posters.add(bitmap);
+        }
+
+        return posters;
     }
 
 

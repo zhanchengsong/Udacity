@@ -101,5 +101,9 @@ public class tmdbRestServices {
         return posters;
     }
 
+    public JsonObject getMovieDetailBySequence(int seq) throws Exception{
+        JsonArray internal_json = this.getPopularMovieList();
+        return internal_json.get(seq).getAsJsonObject();
+    }
 
 }

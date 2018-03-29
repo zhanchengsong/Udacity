@@ -4,8 +4,13 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 
@@ -36,6 +41,20 @@ public class MainActivity extends AppCompatActivity {
 
         GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(bootstrap_data, this, photos));
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                tmdbRestServices services = tmdbRestServices.getTMDBService();
+                try {
+                String movie_name = services.getMovieDetailBySequence(position).get("title").getAsString();
+                Toast.makeText(MainActivity.this, "" + movie_name ,
+                        Toast.LENGTH_SHORT).show();}
+                        catch(Exception e) {
+                    Toast.makeText(MainActivity.this, "Error occured" , Toast.LENGTH_LONG).show();
+                        }
+            }
+        });
 
     }
 
@@ -68,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
 
 
 }

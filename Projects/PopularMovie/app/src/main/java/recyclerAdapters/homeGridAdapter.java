@@ -50,9 +50,9 @@ public class homeGridAdapter extends RecyclerView.Adapter<homeGridAdapter.ViewHo
         //TODO Get the url fragment from the json and populate use the full url
         //Fetch the object from the JsonArray
         JsonObject movieObj = _data.get(position).getAsJsonObject();
-        String shortPosterPath = movieObj.get("poster_path").getAsString();
-        Log.i("onBindViewHolder","shortPostPath " + shortPosterPath.replace("/",""));
-
+        String shortPosterPath = movieObj.get("poster_path").getAsString().replace("/","");
+        Log.i("onBindViewHolder","shortPostPath " + shortPosterPath);
+        urlBuilder = new HttpUrl.Builder();
         HttpUrl getImageUrl = urlBuilder.scheme("https")
                                 .host(image_basUrl)
                                 .addPathSegment("t")
@@ -62,7 +62,7 @@ public class homeGridAdapter extends RecyclerView.Adapter<homeGridAdapter.ViewHo
                                 .build();
         Log.i("ImageRequest", getImageUrl.toString() );
         Picasso.with(this._context).load(getImageUrl.toString()).into(holder.posterIV);
-
+        shortPosterPath="";
     }
 
     @Override

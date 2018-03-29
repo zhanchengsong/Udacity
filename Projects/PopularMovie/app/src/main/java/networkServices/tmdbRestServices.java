@@ -29,6 +29,7 @@ public class tmdbRestServices {
     private HttpUrl.Builder httpbuilder;
     private static tmdbRestServices _service;
     private OkHttpClient client;
+    private JsonArray popularMovieListJson;
     //Private constructor for Singleton
     private tmdbRestServices(){
         this.baseUrl = "api.themoviedb.org";
@@ -37,6 +38,7 @@ public class tmdbRestServices {
         this._gson = new Gson();
         this.httpbuilder = new HttpUrl.Builder();
         this.client = new OkHttpClient();
+        this.popularMovieListJson = null;
     }
 
     //Singleton factory method
@@ -46,7 +48,10 @@ public class tmdbRestServices {
     }
     //Rest call using HttpClient
     public JsonArray getPopularMovieList() throws Exception{
-        JsonArray resultMovieList = null;
+
+        if (this.popularMovieListJson!=null ) {
+            return popularMovieListJson;
+        }
         HttpUrl getPopularMovieListURL =
                 httpbuilder.scheme("https")
                 .host(baseUrl)
@@ -72,10 +77,10 @@ public class tmdbRestServices {
                                             + "\n" + "Body " + res_body);
 
         if (res_body!=null) {
-            resultMovieList = _gson.fromJson(res_body,JsonObject.class).getAsJsonArray("results");
+            this.popularMovieListJson = _gson.fromJson(res_body,JsonObject.class).getAsJsonArray("results");
 
         }
-        return resultMovieList;
+        return popularMovieListJson;
     }
 
 

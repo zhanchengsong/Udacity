@@ -1,5 +1,6 @@
 package ninja.zhancheng.popularmovie;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 
@@ -47,9 +49,11 @@ public class MainActivity extends AppCompatActivity {
                                     int position, long id) {
                 tmdbRestServices services = tmdbRestServices.getTMDBService();
                 try {
-                String movie_name = services.getMovieDetailBySequence(position).get("title").getAsString();
-                Toast.makeText(MainActivity.this, "" + movie_name ,
-                        Toast.LENGTH_SHORT).show();}
+                JsonObject detail_info = services.getMovieDetailBySequence(position);
+                Intent goToDetailIntent = new Intent(MainActivity.this, movieDetailActivity.class);
+                goToDetailIntent.putExtra("detailJson", detail_info.toString());
+                startActivity(goToDetailIntent);
+                }
                         catch(Exception e) {
                     Toast.makeText(MainActivity.this, "Error occured" , Toast.LENGTH_LONG).show();
                         }

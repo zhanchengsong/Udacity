@@ -35,15 +35,17 @@ public class tmdbRestServices {
     private static tmdbRestServices _service;
     private OkHttpClient client;
     private JsonArray popularMovieListJson;
+    private JsonArray topRatedMovieListJson;
     //Private constructor for Singleton
     private tmdbRestServices(){
         this.baseUrl = "api.themoviedb.org";
         //TODO: Remove API key before commit/ push
-        this.apiKey = "8350d10bc2933344952c5f211b409d2a";
+        this.apiKey = "YOUR_API_KEY";
         this._gson = new Gson();
         this.httpbuilder = new HttpUrl.Builder();
         this.client = new OkHttpClient();
         this.popularMovieListJson = null;
+        this.topRatedMovieListJson = null;
     }
 
     //Singleton factory method
@@ -88,6 +90,37 @@ public class tmdbRestServices {
         return popularMovieListJson;
     }
 
+    public JsonArray getTopRatedMovieListJson() throws Exception{
+        if (this.topRatedMovieListJson!=null) {
+            return topRatedMovieListJson;
+        }
+        this.httpbuilder = new HttpUrl.Builder();
+        HttpUrl topRatedMovieURL =
+                httpbuilder.scheme("https")
+                        .host(baseUrl)
+                        .addPathSegment("3")
+                        .addPathSegment("movie")
+                        .addPathSegment("top_rated")
+                        .addQueryParameter("api_key", apiKey)
+                        .build();
+        Request topRatedMovieRequest = new Request.Builder().url(topRatedMovieURL).build();
+        Response topRatedMovieResponse = client.newCall(topRatedMovieRequest).execute();
+
+        String res_body = topRatedMovieResponse.body().string();
+        Log.i("REST Service", "GET " + topRatedMovieURL.toString()
+                + "\n" + "Response " + topRatedMovieResponse.toString()
+                + "\n" + "Body " + res_body);
+
+        if (res_body!=null) {
+            this.topRatedMovieListJson = _gson.fromJson(res_body,JsonObject.class).getAsJsonArray("results");
+
+        }
+        return topRatedMovieListJson;
+
+    }
+
+
+
     public List<Bitmap> getPopularPosters() throws Exception {
         JsonArray internal_json = this.getPopularMovieList();
         Log.i ("getPopularPosters", "Processiong JSON: " + internal_json);
@@ -104,6 +137,34 @@ public class tmdbRestServices {
     public JsonObject getMovieDetailBySequence(int seq) throws Exception{
         JsonArray internal_json = this.getPopularMovieList();
         return internal_json.get(seq).getAsJsonObject();
+    }
+
+    public List<Bitmap> loadPictures(JsonArray data) throws Exception {
+        List<Bitmap> posters = new ArrayList<>();
+        for (int i=0; i<data.size(); i++){
+            URL photo_url = new URL("http://image.tmdb.org/t/p/w185/" + data.get(i).getAsJsonObject().get("poster_path").getAsString());
+            Bitmap bitmap = BitmapFactory.decodeStream(  (InputStream) photo_url.getContent() );
+            posters.add(bitmap);
+        }
+
+        return posters;
+    }
+
+    public JsonObject getMovieDetailById(String mId) throws Exception {
+        HttpUrl getMovieByIdUrl = new HttpUrl.Builder()
+                .scheme("https")
+                .host(baseUrl)
+                .addPathSegment("3")
+                .addPathSegment("movie")
+                .addPathSegment(mId)
+                .addQueryParameter("api_key", apiKey)
+                .build();
+        Request getMovieRequest = new Request.Builder().url(getMovieByIdUrl).build();
+        Response getMoveResponse = client.newCall(getMovieRequest).execute();
+        if (getMoveResponse.body()!=null) {
+            return _gson.fromJson(getMoveResponse.body().string(),JsonObject.class);
+        }
+        return null;
     }
 
 }

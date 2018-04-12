@@ -40,7 +40,7 @@ public class tmdbRestServices {
     private tmdbRestServices(){
         this.baseUrl = "api.themoviedb.org";
         //TODO: Remove API key before commit/ push
-        this.apiKey = "YOUR_API_KEY";
+        this.apiKey = "8350d10bc2933344952c5f211b409d2a";
         this._gson = new Gson();
         this.httpbuilder = new HttpUrl.Builder();
         this.client = new OkHttpClient();
